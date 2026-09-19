@@ -1,0 +1,5 @@
+# Keep Kaggle's CUDA-enabled torch installation. Do not replace it with CPU torch.
+transformers==4.57.6
+huggingface-hub==0.36.0
+safetensors==0.6.2
+

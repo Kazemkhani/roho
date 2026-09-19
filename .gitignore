@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+.ipynb_checkpoints/
+runs/
+dist/
+.DS_Store
+*.egg-info/
+.env
+kaggle.json
+*.token
+

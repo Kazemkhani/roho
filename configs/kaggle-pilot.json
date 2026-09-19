@@ -1,0 +1,18 @@
+{
+  "stage": "exploratory_pilot",
+  "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "main",
+  "seed": 20260919,
+  "dataset_seed": 93707,
+  "arms": ["A", "C", "D", "E"],
+  "tasks": {"train": 24, "dev": 12, "test": 24},
+  "iterations": 2,
+  "candidates": 2,
+  "max_steps": 8,
+  "max_new_tokens": 256,
+  "max_context": 8192,
+  "history_pairs": 2,
+  "task_seconds": 120,
+  "search_tokens_per_arm": 2000000
+}
+
