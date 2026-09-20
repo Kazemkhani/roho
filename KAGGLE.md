@@ -46,7 +46,7 @@ The supplied notebook performs:
 5. Freeze, then the five-case pilot-test batch.
 6. Descriptive report and output ZIP.
 
-The default model is [Qwen2.5-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct). The adapter uses float16 on `cuda:0`, `trust_remote_code=False`, safe-tensor weights and no distributed training. Only one GPU is used; two assigned T4s do not automatically pool their memory. The driver resolves the model revision to a commit and writes it to `model.json`.
+The default model is [Qwen2.5-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct). The adapter uses float32 on `cuda:0`, `trust_remote_code=False`, safe-tensor weights and no distributed training. Float32 is deliberate: the first Kaggle T4 smoke attempt produced non-finite float16 sampling scores and corrupted `!`-only output. The notebook now runs a short generation-integrity preflight before optimization. The 1.5B model fits on one T4 at float32. Only one GPU is used; two assigned T4s do not automatically pool their memory. The driver resolves the model revision to a commit and writes it to `model.json`.
 
 Do not install CPU-only PyTorch over the Kaggle image. If CUDA is false, stop and correct notebook settings. If a package install conflicts with an already imported library, restart the notebook session/kernel and rerun from the beginning before interpreting any results.
 
@@ -120,9 +120,10 @@ Turn off the active GPU session when finished. Do not schedule repeated GPU runs
 | `roho-source.zip` not found | Attach the private source dataset; inspect `/kaggle/input` |
 | CUDA unavailable | Enable an available GPU; check account/quota requirements |
 | Download fails | Check Internet access; restart only after preserving outputs |
+| Corrupted repeated-character output | Stop the run; do not score it as model failure. Use the committed float32 adapter and require the notebook preflight to pass |
 | GPU out of memory | Restart to release other models; use smoke first; make any smaller-model/config change in a new output directory |
 | Invalid JSON or no accepted changes | Inspect stored proposals; these are legitimate pilot failures |
 | Source/config mismatch on resume | Restore the exact source/config used by that run; otherwise start a new run |
 | `Context ceiling exceeded` | Inspect trace/prompt lengths; do not silently truncate the task or change a frozen main run |
 
-GPU execution has not been validated by this assistant on your Kaggle account. The notebook is a prepared handoff; the exact validation sequence is steps 3–6 above.
+GPU execution was validated on 20 September 2026 on the user's free Kaggle Tesla T4 runtime with Torch 2.10.0+cu128, Transformers 4.57.6 and Qwen revision `989aa7980e4cf806f80c7fef2b1adb7bc71aa306`. The corrected smoke artifact and limitations are recorded in `results/README.md`.

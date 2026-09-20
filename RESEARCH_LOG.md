@@ -1,6 +1,6 @@
 # Research provenance
 
-Date: 19 September 2026.
+Date: 20 September 2026.
 
 ## Tools actually used in this phase
 
@@ -11,7 +11,7 @@ Date: 19 September 2026.
 - `apply_patch`: first authored the specification package, then the bounded pilot after the user selected Kaggle and requested a runnable GitHub repository.
 - `agent-reach check-update`: attempted; DNS lookup failed after the tool's retries. No update installed and no update availability claim made.
 
-No social media evidence was needed for these technical claims. No paid API inference, model download or real Qwen run occurred locally. Jina Reader was available in the skill instructions but was not used in this phase. The subsequent private GitHub publication is explicitly user-authorized; it is not a public research release.
+No social media evidence was needed for these technical claims. No paid API inference occurred locally. Jina Reader was available in the skill instructions but was not used in this phase. The subsequent private GitHub publication is explicitly user-authorized; it is not a public research release.
 
 ## Important research decisions
 
@@ -35,6 +35,10 @@ The source map links papers directly and distinguishes detailed method inspectio
 
 The Jupyter Notebooks skill was read and used to structure a tutorial notebook with setup, bounded execution, checks and output export. Kaggle's official notebook documentation and official Docker repository were checked; Qwen's model card and the pinned Transformers release page were opened. Current quota amounts are deliberately not promised.
 
-Local verification uses standard-library unit tests, reference solutions for 90 synthetic instances, a mock end-to-end optimization/freeze/test/report cycle, Python compilation and notebook structure/code-cell validation. These checks cannot establish that CUDA dependencies work on the user's Kaggle image. Run the notebook on Kaggle to close that execution gap.
+Local verification uses standard-library unit tests, reference solutions for 90 synthetic instances, a mock end-to-end optimization/freeze/test/report cycle, Python compilation and notebook structure/code-cell validation.
+
+The notebook was run in the user's private Kaggle workspace on 20 September 2026. The source dataset stayed private, Internet was enabled, and Kaggle allocated two Tesla T4 devices while the code used `cuda:0` only. All 26 repository tests passed in Kaggle before inference.
+
+The first real run exposed non-finite float16 sampling scores and `!`-only generations. That run was excluded as runtime corruption, not counted as task failure. A float32 preflight produced sane JSON, after which a clean frozen run completed. The corrected artifact reports 3/5 final-task success for every arm, zero lost baseline successes, 602.6 mean tokens per task, and 918 search tokens for each learned arm. All three proposals were rejected for a forbidden nested schema, so this run demonstrates execution feasibility but no harness optimization gain. The complete artifact is `results/roho-smoke-results.zip`; its interpretation is in `results/README.md`.
 
 The private GitHub workflow is manual-only (`workflow_dispatch`), so publishing does not automatically start Actions jobs or consume a private Actions allowance. The default computational work is performed on the user's free Kaggle allocation.

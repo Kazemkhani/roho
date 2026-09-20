@@ -75,8 +75,8 @@ class HFBackend(Backend):
             if old["revision"] != self.revision or old["model_id"] != model_id:
                 raise ValueError("Model revision changed; resume requires recorded commit")
         self.tokenizer = AutoTokenizer.from_pretrained(model_id, revision=self.revision, trust_remote_code=False)
-        self.model = AutoModelForCausalLM.from_pretrained(model_id, revision=self.revision, torch_dtype=torch.float16, trust_remote_code=False, use_safetensors=True, attn_implementation="eager").to("cuda:0").eval()
-        write_json(metadata_path, {"model_id": model_id, "revision": self.revision, "dtype": "float16", "torch": torch.__version__, "transformers": transformers.__version__, "gpu": torch.cuda.get_device_name(0), "device": "cuda:0", "max_context": max_context})
+        self.model = AutoModelForCausalLM.from_pretrained(model_id, revision=self.revision, dtype=torch.float32, trust_remote_code=False, use_safetensors=True, attn_implementation="eager").to("cuda:0").eval()
+        write_json(metadata_path, {"model_id": model_id, "revision": self.revision, "dtype": "float32", "torch": torch.__version__, "transformers": transformers.__version__, "gpu": torch.cuda.get_device_name(0), "device": "cuda:0", "max_context": max_context})
 
     def encode(self, text):
         return self.tokenizer.encode(text, add_special_tokens=False)
@@ -95,11 +95,16 @@ class HFBackend(Backend):
         if len(ids) + max_new_tokens > self.max_context:
             raise ValueError("Context ceiling exceeded; no silent task truncation")
         inputs = torch.tensor([ids], device="cuda:0")
-        kwargs = {"max_new_tokens": max_new_tokens, "do_sample": temperature > 0, "pad_token_id": self.tokenizer.eos_token_id}
+        kwargs = {
+            "max_new_tokens": max_new_tokens,
+            "do_sample": temperature > 0,
+            "pad_token_id": self.tokenizer.eos_token_id,
+            "remove_invalid_values": True,
+            "renormalize_logits": True,
+        }
         if temperature > 0:
             kwargs.update(temperature=temperature, top_p=.9)
         with torch.inference_mode():
             output = self.model.generate(input_ids=inputs, attention_mask=torch.ones_like(inputs), **kwargs)
         continuation = output[0, len(ids):]
         return self.tokenizer.decode(continuation, skip_special_tokens=True), len(continuation)
-

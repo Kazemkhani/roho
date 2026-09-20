@@ -2,7 +2,7 @@
 
 Authors: Saksham Mishra and Amir Hossein Kazemkhani, University of Birmingham.
 
-Prepared: 19 September 2026. Status: **executable exploratory pilot + prospective protocol v0.1**, not a completed paper, preregistration, or experimental finding. Author names and affiliation are user-supplied and require author confirmation before submission.
+Prepared: 20 September 2026. Status: **executed exploratory smoke pilot + prospective protocol v0.1**, not a completed paper, preregistration, or confirmatory finding. Author names and affiliation are user-supplied and require author confirmation before submission.
 
 ## Start here
 
@@ -27,7 +27,7 @@ python -m roho evaluate --out /kaggle/working/roho-smoke --confirm-frozen
 python -m roho report --out /kaggle/working/roho-smoke
 ```
 
-The [notebook](notebooks/roho_kaggle.ipynb) automates these smoke-test steps. A maximum of 60 task episodes are scheduled by the smoke configuration before invalid-proposal skips; the larger pilot schedules up to 564. No runtime or success improvement is promised. Only the first GPU is used, even if Kaggle assigns two.
+The [notebook](notebooks/roho_kaggle.ipynb) automates these smoke-test steps and includes a generation-integrity preflight. A maximum of 60 task episodes are scheduled by the smoke configuration before invalid-proposal skips; the larger pilot schedules up to 564. No runtime or success improvement is promised. Only the first GPU is used, even if Kaggle assigns two.
 
 CPU-only software check (no model download):
 
@@ -59,8 +59,8 @@ The suggested study concerns local, frozen-model tool agents. It does not reuse 
 
 ## What is ready, and what is not
 
-The research question, controlled contrasts, and implementation boundaries are specified. A bounded pilot benchmark, optimizer, model adapter and software tests are implemented. No real ROHO Qwen/Kaggle experiment has run yet. There are no measured LLM gains or publication-ready empirical conclusions.
+The research question, controlled contrasts, and implementation boundaries are specified. A bounded pilot benchmark, optimizer, model adapter and software tests are implemented. A real Qwen/Kaggle smoke run completed on a Tesla T4 after a float16 corruption preflight led to a documented float32 rerun. The corrected five-case test batch reached 60% for every arm; all learned-arm proposals were invalid and no harness changed. See [the result record](results/README.md). This is runtime feasibility evidence, not measured optimization gain or a publication-ready result.
 
-Next action: run the supplied Kaggle smoke notebook, inspect its model-call and proposal logs, then decide whether the larger pilot is worthwhile. Qwen2.5-1.5B-Instruct is a small ungated starting model loaded from its official Hugging Face repository. Its resolved commit is recorded; this is not a claim that it is strong enough for the eventual paper.
+Next action: freeze an improved schema-constrained proposer/classifier prompt and rerun a new smoke seed without reusing the opened test batch. Qwen2.5-1.5B-Instruct is a small ungated starting model loaded from its official Hugging Face repository. Its resolved commit is recorded; the first smoke run shows that it can execute the tasks but did not produce an admissible mutation under the current prompt.
 
 Main-study model choice, runtime ceilings, independent templates and statistical repeat count remain feasibility-stage decisions. Freeze them and all dataset hashes before main experiments. The user requested a private GitHub repository; no arXiv or Zenodo publication is authorized by that request.
